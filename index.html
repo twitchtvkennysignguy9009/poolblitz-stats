@@ -1,0 +1,433 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<title>Pool Blitz - Live W/L Record</title>
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --card: #161616;
+    --win: #22c55e;
+    --loss: #ef4444;
+    --mute: #6b7280;
+    --txt: #f5f5f5;
+    --accent: #f59e0b;
+    --border: #1f1f1f;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--txt);
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    min-height: 100%;
+  }
+  header {
+    text-align: center;
+    padding: 22px 16px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  header .title {
+    font-size: 14px;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: var(--mute);
+  }
+  header .name {
+    margin-top: 6px;
+    font-size: 32px;
+    font-weight: 900;
+    letter-spacing: 4px;
+    color: var(--accent);
+  }
+  header .updated {
+    margin-top: 6px;
+    font-size: 12px;
+    letter-spacing: 2px;
+    color: var(--mute);
+  }
+
+  .totals {
+    max-width: 980px;
+    margin: 20px auto 14px;
+    padding: 22px 24px;
+    background: var(--card);
+    border: 2px solid var(--accent);
+    border-radius: 16px;
+    box-shadow: 0 0 0 4px rgba(245,158,11,0.10);
+  }
+  .totals .label {
+    letter-spacing: 5px;
+    color: var(--accent);
+    font-size: 24px;
+    font-weight: 800;
+    margin-bottom: 14px;
+    display: block;
+    text-align: center;
+  }
+  .totals .modes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+  }
+  .totals .modes .item {
+    background: #1c1c1c;
+    padding: 14px 16px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    font-size: 24px;
+    letter-spacing: 2px;
+    font-weight: 700;
+  }
+  .totals .modes .mlabel { color: #ddd; }
+  .totals .modes .w { color: var(--win); font-weight: 900; }
+  .totals .modes .l { color: var(--loss); font-weight: 900; }
+  .totals .modes .dash { color: #555; }
+
+  .nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 18px;
+    padding: 12px 16px;
+  }
+  .nav button {
+    background: #141414;
+    color: var(--txt);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 16px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  .nav button:hover { border-color: var(--accent); }
+  .nav .month-label {
+    min-width: 220px;
+    text-align: center;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 3px;
+  }
+
+  .calendar {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 0 16px 18px;
+  }
+  .dow {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    margin-bottom: 6px;
+  }
+  .dow div {
+    text-align: center;
+    font-size: 12px;
+    letter-spacing: 2px;
+    color: var(--mute);
+    padding: 6px 0;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+  }
+  .cell {
+    background: var(--card);
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    aspect-ratio: 1 / 1;
+    padding: 8px 6px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    cursor: pointer;
+    position: relative;
+  }
+  .cell.empty { background: transparent; border-color: transparent; cursor: default; }
+  .cell:hover:not(.empty):not(.future) { border-color: var(--accent); }
+  .cell.active { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(245,158,11,.18); }
+  .cell.future { opacity: 0.32; cursor: default; }
+  .daynum { font-size: 16px; font-weight: 700; color: #aaa; }
+  .wl {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.05;
+  }
+  .wl .w { color: var(--win); font-weight: 800; font-size: 18px; }
+  .wl .l { color: var(--loss); font-weight: 800; font-size: 18px; }
+  .wl .none { color: #444; font-size: 12px; letter-spacing: 1px; }
+  .cell.win-day { background: linear-gradient(135deg, #0e1a12 0%, #161616 60%); border-color: rgba(34,197,94,.40); }
+  .cell.loss-day { background: linear-gradient(135deg, #1a0e0e 0%, #161616 60%); border-color: rgba(239,68,68,.40); }
+  .cell.even-day { background: linear-gradient(135deg, #1a1610 0%, #161616 60%); border-color: rgba(245,158,11,.35); }
+
+  .panel {
+    max-width: 980px;
+    margin: 18px auto;
+    padding: 18px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+  .panel h2 {
+    margin: 0 0 12px 0;
+    font-size: 20px;
+    letter-spacing: 3px;
+    color: var(--accent);
+  }
+  .panel .rows {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+  }
+  .panel .row {
+    background: #1f1f1f;
+    border-radius: 8px;
+    padding: 12px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .panel .row .mode { letter-spacing: 2px; font-weight: 700; }
+  .panel .row .wl { font-size: 20px; font-variant-numeric: tabular-nums; text-align: right; }
+  .panel .row .wl .w { color: var(--win); }
+  .panel .row .wl .l { color: var(--loss); }
+
+  footer {
+    text-align: center;
+    padding: 14px 0 30px;
+    font-size: 11px;
+    color: var(--mute);
+    letter-spacing: 2px;
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="title">Pool Blitz &middot; Live W/L Record</div>
+  <div class="name" id="streamerName">&mdash;</div>
+  <div class="updated">LAST UPDATED: <span id="updatedAt">&mdash;</span></div>
+</header>
+
+<div class="totals">
+  <span class="label">LIFETIME TOTAL</span>
+  <div class="modes" id="totalsRow"></div>
+</div>
+
+<div class="nav">
+  <button id="prevMonth">&larr; Prev</button>
+  <div class="month-label" id="monthLabel">&mdash;</div>
+  <button id="nextMonth">Next &rarr;</button>
+  <button id="goToday" title="Jump to current month">Latest</button>
+</div>
+
+<div class="calendar">
+  <div class="dow">
+    <div>SUN</div><div>MON</div><div>TUE</div><div>WED</div><div>THU</div><div>FRI</div><div>SAT</div>
+  </div>
+  <div class="grid" id="grid"></div>
+</div>
+
+<div class="panel">
+  <h2 id="panelTitle">SELECT A DAY</h2>
+  <div class="rows" id="panelRows"></div>
+</div>
+
+<footer>POOL BLITZ STATS &middot; AUTO-UPDATES WHEN STREAMER PUBLISHES</footer>
+
+<script>
+const STREAMER = "TWITCHTVKENNYSIGNGUY9009";
+const MODES = [
+  { key: '8ball',      label: '8-BALL'  },
+  { key: '9ball',      label: '9-BALL'  },
+  { key: 'blitz',      label: 'BLITZ'   },
+  { key: 'tournament', label: 'TOURNEY' },
+];
+const MONTH_NAMES = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+
+function pad(n) { return String(n).padStart(2, '0'); }
+function dateKey(y, m, d) { return `${y}-${pad(m+1)}-${pad(d)}`; }
+function parseKey(k) {
+  const [y, m, d] = k.split('-').map(Number);
+  return new Date(y, m-1, d);
+}
+function formatBig(dt) {
+  return `${MONTH_NAMES[dt.getMonth()]} ${dt.getDate()}, ${dt.getFullYear()}`;
+}
+
+let state = null;
+let viewYear, viewMonth;
+let selectedKey = null;
+let latestKey = null;
+
+async function pullState() {
+  // Cache-bust so viewers always see the latest after a publish
+  const r = await fetch('./state.json?t=' + Date.now(), { cache: 'no-store' });
+  state = await r.json();
+  // Latest activity date = max key in daily, or today if state has activity
+  const days = Object.keys(state.daily || {}).sort();
+  latestKey = days.length ? days[days.length - 1] : null;
+}
+
+function sumDay(dayObj) {
+  let w = 0, l = 0;
+  if (!dayObj) return { wins: 0, losses: 0, played: false };
+  for (const m of MODES) {
+    const cell = dayObj[m.key];
+    if (cell) { w += cell.wins | 0; l += cell.losses | 0; }
+  }
+  return { wins: w, losses: l, played: (w + l) > 0 };
+}
+function dayClass(s) {
+  if (!s.played) return '';
+  if (s.wins > s.losses) return 'win-day';
+  if (s.losses > s.wins) return 'loss-day';
+  return 'even-day';
+}
+
+function renderCalendar() {
+  document.getElementById('monthLabel').textContent = `${MONTH_NAMES[viewMonth]} ${viewYear}`;
+
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+
+  const firstDay = new Date(viewYear, viewMonth, 1);
+  const lastDay = new Date(viewYear, viewMonth + 1, 0);
+  const startDow = firstDay.getDay();
+
+  const latestDate = latestKey ? parseKey(latestKey) : new Date();
+  const latestY = latestDate.getFullYear(), latestM = latestDate.getMonth(), latestD = latestDate.getDate();
+
+  for (let i = 0; i < startDow; i++) {
+    const c = document.createElement('div');
+    c.className = 'cell empty';
+    grid.appendChild(c);
+  }
+
+  for (let d = 1; d <= lastDay.getDate(); d++) {
+    const key = dateKey(viewYear, viewMonth, d);
+    const dayData = state.daily?.[key];
+    const summary = sumDay(dayData);
+
+    const c = document.createElement('div');
+    c.className = 'cell ' + dayClass(summary);
+    if (key === selectedKey) c.classList.add('active');
+
+    const isFuture = (viewYear > latestY) ||
+                     (viewYear === latestY && viewMonth > latestM) ||
+                     (viewYear === latestY && viewMonth === latestM && d > latestD);
+    if (isFuture) c.classList.add('future');
+
+    const top = document.createElement('div');
+    top.className = 'daynum';
+    top.textContent = d;
+    c.appendChild(top);
+
+    const wl = document.createElement('div');
+    wl.className = 'wl';
+    if (summary.played) {
+      wl.innerHTML = `<span class="w">${summary.wins}W</span> &middot; <span class="l">${summary.losses}L</span>`;
+    } else {
+      wl.innerHTML = `<span class="none">&ndash;</span>`;
+    }
+    c.appendChild(wl);
+
+    if (!isFuture) {
+      c.addEventListener('click', () => {
+        selectedKey = key;
+        renderCalendar();
+        renderPanel();
+      });
+    }
+
+    grid.appendChild(c);
+  }
+}
+
+function renderPanel() {
+  const title = document.getElementById('panelTitle');
+  const rows = document.getElementById('panelRows');
+  rows.innerHTML = '';
+  if (!selectedKey) { title.textContent = 'SELECT A DAY'; return; }
+  title.textContent = formatBig(parseKey(selectedKey));
+  const dayData = state.daily?.[selectedKey];
+  for (const m of MODES) {
+    const cell = dayData?.[m.key] || { wins: 0, losses: 0 };
+    const row = document.createElement('div');
+    row.className = 'row';
+    row.innerHTML = `
+      <div class="mode">${m.label}</div>
+      <div class="wl"><span class="w">${cell.wins}</span> - <span class="l">${cell.losses}</span></div>
+    `;
+    rows.appendChild(row);
+  }
+}
+
+function renderTotals() {
+  const tr = document.getElementById('totalsRow');
+  tr.innerHTML = '';
+  for (const m of MODES) {
+    const cell = state[m.key] || { wins: 0, losses: 0 };
+    const item = document.createElement('div');
+    item.className = 'item';
+    item.innerHTML = `
+      <span class="mlabel">${m.label}</span>
+      <span><span class="w">${cell.wins}</span> <span class="dash">-</span> <span class="l">${cell.losses}</span></span>
+    `;
+    tr.appendChild(item);
+  }
+}
+
+function renderHeader() {
+  document.getElementById('streamerName').textContent = STREAMER;
+  if (state.updated_at) {
+    document.getElementById('updatedAt').textContent = state.updated_at;
+  } else if (latestKey) {
+    document.getElementById('updatedAt').textContent = formatBig(parseKey(latestKey));
+  }
+}
+
+async function init() {
+  await pullState();
+  renderHeader();
+  const target = latestKey ? parseKey(latestKey) : new Date();
+  viewYear = target.getFullYear();
+  viewMonth = target.getMonth();
+  selectedKey = latestKey;
+
+  document.getElementById('prevMonth').addEventListener('click', () => {
+    viewMonth--; if (viewMonth < 0) { viewMonth = 11; viewYear--; }
+    renderCalendar();
+  });
+  document.getElementById('nextMonth').addEventListener('click', () => {
+    viewMonth++; if (viewMonth > 11) { viewMonth = 0; viewYear++; }
+    renderCalendar();
+  });
+  document.getElementById('goToday').addEventListener('click', () => {
+    if (!latestKey) return;
+    const t = parseKey(latestKey);
+    viewYear = t.getFullYear();
+    viewMonth = t.getMonth();
+    selectedKey = latestKey;
+    renderCalendar(); renderPanel();
+  });
+
+  renderCalendar(); renderPanel(); renderTotals();
+
+  // Re-fetch every 60s so viewers see updates without manual refresh
+  setInterval(async () => {
+    await pullState();
+    renderHeader(); renderCalendar(); renderPanel(); renderTotals();
+  }, 60000);
+}
+init().catch(e => {
+  document.body.innerHTML = '<div style="padding:40px;text-align:center;color:#888;font-family:sans-serif;">Stats not yet published. Check back soon.</div>';
+});
+</script>
+</body>
+</html>
