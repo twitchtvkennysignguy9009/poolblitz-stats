@@ -4,8 +4,8 @@
     "losses": 4
   },
   "9ball": {
-    "wins": 4,
-    "losses": 1
+    "wins": 8,
+    "losses": 4
   },
   "blitz": {
     "wins": 77,
@@ -38,8 +38,8 @@
         "losses": 0
       },
       "9ball": {
-        "wins": 4,
-        "losses": 1
+        "wins": 8,
+        "losses": 4
       }
     }
   },
