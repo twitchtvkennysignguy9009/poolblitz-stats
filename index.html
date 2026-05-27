@@ -114,10 +114,20 @@
     letter-spacing: 3px;
   }
 
-  .calendar {
-    max-width: 980px;
+  .calendar-wrap {
+    max-width: 1280px;
     margin: 0 auto;
     padding: 0 16px 18px;
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: 18px;
+    align-items: start;
+  }
+  @media (max-width: 900px) {
+    .calendar-wrap { grid-template-columns: 1fr; }
+  }
+  .calendar {
+    min-width: 0;
   }
   .dow {
     display: grid;
@@ -167,36 +177,55 @@
   .cell.even-day { background: linear-gradient(135deg, #1a1610 0%, #161616 60%); border-color: rgba(245,158,11,.35); }
 
   .panel {
-    max-width: 980px;
-    margin: 18px auto;
-    padding: 18px;
+    padding: 16px;
     background: var(--card);
-    border: 1px solid var(--border);
+    border: 2px solid var(--accent);
     border-radius: 12px;
+    position: sticky;
+    top: 12px;
   }
   .panel h2 {
     margin: 0 0 12px 0;
-    font-size: 20px;
-    letter-spacing: 3px;
+    font-size: 18px;
+    letter-spacing: 2px;
     color: var(--accent);
+    text-align: center;
   }
   .panel .rows {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    display: flex;
+    flex-direction: column;
     gap: 10px;
   }
   .panel .row {
-    background: #1f1f1f;
-    border-radius: 8px;
-    padding: 12px 14px;
+    background: #1c1c1c;
+    border-radius: 10px;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .panel .row .mode {
+    letter-spacing: 3px;
+    font-weight: 800;
+    font-size: 13px;
+    color: #cbd5e1;
+    margin-bottom: 4px;
+  }
+  .panel .row .wlrow {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: baseline;
+    font-size: 20px;
+    font-variant-numeric: tabular-nums;
+    font-weight: 800;
   }
-  .panel .row .mode { letter-spacing: 2px; font-weight: 700; }
-  .panel .row .wl { font-size: 20px; font-variant-numeric: tabular-nums; text-align: right; }
-  .panel .row .wl .w { color: var(--win); }
-  .panel .row .wl .l { color: var(--loss); }
+  .panel .row .wlrow .lbl {
+    font-size: 13px;
+    letter-spacing: 2px;
+    font-weight: 700;
+  }
+  .panel .row .wlrow.win  .lbl, .panel .row .wlrow.win  .v { color: var(--win); }
+  .panel .row .wlrow.loss .lbl, .panel .row .wlrow.loss .v { color: var(--loss); }
 
   footer {
     text-align: center;
@@ -226,16 +255,17 @@
   <button id="goToday" title="Jump to current month">Latest</button>
 </div>
 
-<div class="calendar">
-  <div class="dow">
-    <div>SUN</div><div>MON</div><div>TUE</div><div>WED</div><div>THU</div><div>FRI</div><div>SAT</div>
+<div class="calendar-wrap">
+  <div class="calendar">
+    <div class="dow">
+      <div>SUN</div><div>MON</div><div>TUE</div><div>WED</div><div>THU</div><div>FRI</div><div>SAT</div>
+    </div>
+    <div class="grid" id="grid"></div>
   </div>
-  <div class="grid" id="grid"></div>
-</div>
-
-<div class="panel">
-  <h2 id="panelTitle">SELECT A DAY</h2>
-  <div class="rows" id="panelRows"></div>
+  <div class="panel">
+    <h2 id="panelTitle">SELECT A DAY</h2>
+    <div class="rows" id="panelRows"></div>
+  </div>
 </div>
 
 <footer>POOL BLITZ STATS &middot; AUTO-UPDATES WHEN STREAMER PUBLISHES</footer>
@@ -362,7 +392,8 @@ function renderPanel() {
     row.className = 'row';
     row.innerHTML = `
       <div class="mode">${m.label}</div>
-      <div class="wl"><span class="w">${cell.wins}</span> - <span class="l">${cell.losses}</span></div>
+      <div class="wlrow win"><span class="lbl">W</span><span class="v">${cell.wins}</span></div>
+      <div class="wlrow loss"><span class="lbl">L</span><span class="v">${cell.losses}</span></div>
     `;
     rows.appendChild(row);
   }
