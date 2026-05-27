@@ -1,15 +1,42 @@
 {
-  "8ball": {"wins": 6, "losses": 4},
-  "9ball": {"wins": 0, "losses": 0},
-  "blitz": {"wins": 77, "losses": 28},
-  "tournament": {"wins": 0, "losses": 0},
+  "8ball": {
+    "wins": 6,
+    "losses": 4
+  },
+  "9ball": {
+    "wins": 0,
+    "losses": 0
+  },
+  "blitz": {
+    "wins": 77,
+    "losses": 28
+  },
+  "tournament": {
+    "wins": 0,
+    "losses": 0
+  },
   "daily": {
     "2026-05-25": {
-      "blitz": {"wins": 30, "losses": 5}
+      "blitz": {
+        "wins": 30,
+        "losses": 5
+      }
     },
     "2026-05-26": {
-      "blitz": {"wins": 47, "losses": 23},
-      "8ball": {"wins": 6, "losses": 4}
+      "blitz": {
+        "wins": 47,
+        "losses": 23
+      },
+      "8ball": {
+        "wins": 6,
+        "losses": 4
+      }
+    },
+    "2026-05-27": {
+      "blitz": {
+        "wins": 0,
+        "losses": 0
+      }
     }
   },
   "updated_at": "MAY 27, 2026"
