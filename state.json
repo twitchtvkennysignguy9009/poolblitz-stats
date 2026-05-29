@@ -1,15 +1,15 @@
 {
   "8ball": {
     "wins": 26,
-    "losses": 43
+    "losses": 44
   },
   "9ball": {
     "wins": 8,
     "losses": 4
   },
   "blitz": {
-    "wins": 129,
-    "losses": 47
+    "wins": 137,
+    "losses": 58
   },
   "tournament": {
     "wins": 0,
@@ -50,6 +50,16 @@
       "blitz": {
         "wins": 12,
         "losses": 5
+      }
+    },
+    "2026-05-29": {
+      "blitz": {
+        "wins": 8,
+        "losses": 11
+      },
+      "8ball": {
+        "wins": 0,
+        "losses": 1
       }
     }
   },
