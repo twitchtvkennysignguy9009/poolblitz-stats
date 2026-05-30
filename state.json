@@ -1,7 +1,7 @@
 {
   "8ball": {
-    "wins": 39,
-    "losses": 59
+    "wins": 50,
+    "losses": 73
   },
   "9ball": {
     "wins": 8,
@@ -58,8 +58,8 @@
         "losses": 14
       },
       "8ball": {
-        "wins": 13,
-        "losses": 16
+        "wins": 24,
+        "losses": 30
       }
     }
   },
