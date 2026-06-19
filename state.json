@@ -1,15 +1,15 @@
 {
   "8ball": {
-    "wins": 50,
-    "losses": 73
+    "wins": 56,
+    "losses": 83
   },
   "9ball": {
-    "wins": 8,
-    "losses": 4
+    "wins": 10,
+    "losses": 5
   },
   "blitz": {
-    "wins": 144,
-    "losses": 61
+    "wins": 158,
+    "losses": 65
   },
   "tournament": {
     "wins": 0,
@@ -61,7 +61,21 @@
         "wins": 24,
         "losses": 30
       }
+    },
+    "2026-06-19": {
+      "8ball": {
+        "wins": 6,
+        "losses": 10
+      },
+      "blitz": {
+        "wins": 14,
+        "losses": 4
+      },
+      "9ball": {
+        "wins": 2,
+        "losses": 1
+      }
     }
   },
-  "updated_at": "MAY 29, 2026"
+  "updated_at": "JUN 19, 2026"
 }
