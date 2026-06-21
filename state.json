@@ -1,7 +1,7 @@
 {
   "8ball": {
-    "wins": 56,
-    "losses": 83
+    "wins": 64,
+    "losses": 87
   },
   "9ball": {
     "wins": 10,
@@ -74,6 +74,12 @@
       "9ball": {
         "wins": 2,
         "losses": 1
+      }
+    },
+    "2026-06-21": {
+      "8ball": {
+        "wins": 8,
+        "losses": 4
       }
     }
   },
